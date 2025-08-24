@@ -21,24 +21,35 @@ export default function Home() {
     return (
         <Layout>
             <h1>카테고리</h1>
-            <ul style={{ listStyle: "none", padding: 0 }}>
+            <ul style={{
+                listStyle: "none",
+                padding: 0
+            }}>
                 {categories.map((cat) => (
-                    <li key={cat.name} style={{ marginBottom: "0.5rem" }}>
+                    <li key={cat.name} style={{
+                        marginBottom: "0.5rem",
+                        borderRadius: "999px",       // 타원형
+                        background: "#ffe4e1",       // 연한 핑크
+                        padding: "0.5rem 1rem",      // 내부 여백
+                        cursor: "pointer"
+                    }}>
                         <div
                             onClick={() => toggleCategory(cat.name)}
                             style={{
-                                cursor: "pointer",
                                 fontWeight: "bold",
                                 fontSize: "1.2rem",
                                 color: "#222",
-                                padding: "0.3rem 0",
                             }}
                         >
                             {cat.name}
                         </div>
 
                         {openCategory === cat.name && (
-                            <ul style={{ listStyle: "circle", marginLeft: "1rem", marginTop: "0.3rem" }}>
+                            <ul style={{
+                                listStyle: "circle",
+                                marginLeft: "1rem",
+                                marginTop: "0.3rem"
+                            }}>
                                 {cat.sub.map((sub) => (
                                     <li key={sub} style={{ marginBottom: "0.3rem" }}>
                                         <Link
@@ -54,6 +65,7 @@ export default function Home() {
                     </li>
                 ))}
             </ul>
+
         </Layout>
     );
 }
