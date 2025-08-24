@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 
 
 const categories = [
-    { name: "Tech", sub: ["React", "JavaScript", "CSS"] },
+    { name: "Tech", sub: ["React"] },
     { name: "Health", sub: ["Achilles"] },
 //    { name: "Life", sub: ["Traveling", "Food", "Health"] },
 //    { name: "Travel", sub: ["Asia", "Europe", "America"] },
