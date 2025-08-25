@@ -2,13 +2,23 @@
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 
-
 const categories = [
-    { name: "Tech", sub: ["React"] },
-    { name: "Health", sub: ["Achilles"] },
-//    { name: "Life", sub: ["Traveling", "Food", "Health"] },
-//    { name: "Travel", sub: ["Asia", "Europe", "America"] },
-//    { name: "Music", sub: ["Pop", "Jazz", "Classical"] },
+    {
+        name: "기술", path: "tech", sub: [
+            { name: "리액트", path: "react" }
+        ]
+    },
+    {
+        name: "건강", path: "health", sub: [
+            { name: "아킬레스", path: "achilles" }
+        ]
+    },
+    {
+        name: "자가진단", path: "selftest", sub: [
+            { name: "ADHD", path: "adhd" }
+        ]
+    },
+    // 필요하면 더 추가
 ];
 
 export default function Home() {
@@ -26,7 +36,7 @@ export default function Home() {
                 padding: 0
             }}>
                 {categories.map((cat) => (
-                    <li key={cat.name} style={{
+                    <li key={cat.path} style={{
                         marginBottom: "0.5rem",
                         borderRadius: "999px",       // 타원형
                         background: "#ffe4e1",       // 연한 핑크
@@ -41,7 +51,7 @@ export default function Home() {
                                 color: "#222",
                             }}
                         >
-                            {cat.name}
+                            {cat.name} {/* 화면에는 한글 표시 */}
                         </div>
 
                         {openCategory === cat.name && (
@@ -51,12 +61,12 @@ export default function Home() {
                                 marginTop: "0.3rem"
                             }}>
                                 {cat.sub.map((sub) => (
-                                    <li key={sub} style={{ marginBottom: "0.3rem" }}>
+                                    <li key={sub.path} style={{ marginBottom: "0.3rem" }}>
                                         <Link
-                                            to={`/category/${cat.name.toLowerCase()}/${sub.toLowerCase()}`}
+                                            to={`/category/${cat.path}/${sub.path}`} // 링크는 영어
                                             style={{ color: "#007acc", textDecoration: "none" }}
                                         >
-                                            {sub}
+                                            {sub.name} {/* 서브도 한글 표시 */}
                                         </Link>
                                     </li>
                                 ))}
@@ -65,7 +75,6 @@ export default function Home() {
                     </li>
                 ))}
             </ul>
-
         </Layout>
     );
 }
