@@ -10,12 +10,13 @@ const categories = [
     },
     {
         name: "건강", path: "health", sub: [
-            { name: "아킬레스", path: "achilles" }
+            { name: "아킬레스 비수술", path: "achilles" }
         ]
     },
     {
         name: "자가진단", path: "selftest", sub: [
-            { name: "ADHD", path: "adhd" }
+            { name: "ADHD", path: "adhd" },
+            { name: "우을증", path: "melancholia" }
         ]
     },
     // 필요하면 더 추가
