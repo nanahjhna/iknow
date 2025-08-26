@@ -14,20 +14,6 @@ export default function Layout({ children }) {
         };
     }, []);
 
-    // 구글 광고 스크립트 로드
-    useEffect(() => {
-        const script = document.createElement("script");
-        script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1474045642143501";
-        script.async = true;
-        script.crossOrigin = "anonymous";
-        document.body.appendChild(script);
-
-        return () => {
-            document.body.removeChild(script);
-        };
-    }, []);
-
-
     return (
         <div className="container" style={{ maxWidth: "960px", margin: "0 auto" }}>
 
@@ -84,13 +70,6 @@ export default function Layout({ children }) {
                     data-ad-width="320"
                     data-ad-height="100"
                 ></ins>
-
-                <ins className="adsbygoogle"
-                    style={{ display: "block" }}
-                    data-ad-client="ca-pub-1474045642143501"
-                    data-ad-slot="YOUR_SLOT_ID"
-                    data-ad-format="auto"></ins>
-
                 <p style={{ margin: 0, color: "#555", marginTop: "0.5rem" }}>
                     © 2025 My Blog. All rights reserved.
                 </p>
