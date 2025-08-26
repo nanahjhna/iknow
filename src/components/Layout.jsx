@@ -53,6 +53,8 @@ export default function Layout({ children }) {
                     data-ad-width="320"
                     data-ad-height="100"></ins>
                 <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1474045642143501"
+                    crossorigin="anonymous"></script>
                 <p style={{ margin: 0, color: "#555", marginTop: "0.5rem" }}>
                     © 2025 My Blog. All rights reserved.
                 </p>
