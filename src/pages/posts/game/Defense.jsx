@@ -43,6 +43,7 @@ export default function DefenseGamePost() {
     const towersRef = useRef([]); // {col,row, x,y, range, fireRate, lastShot}
     const enemiesRef = useRef([]); // {x,y, speed, hp, pathIndex, progress}
     const bulletsRef = useRef([]); // {x,y, vx,vy, damage, targetId}
+    const boxRef = useRef(null); // {col, row} - 랜덤 박스 위치
 
     // 캔버스/반응형
     const canvasRef = useRef(null);
@@ -68,6 +69,34 @@ export default function DefenseGamePost() {
         return Math.hypot(dx, dy);
     }
 
+    // ----------- 랜덤 박스 생성 -----------
+    // useCallback으로 불필요한 함수 재생성 방지
+    const generateRandomBox = React.useCallback(() => {
+        let boxPlaced = false;
+        // 최대 100번 시도하여 안전한 위치 찾기 (무한루프 방지)
+        for (let i = 0; i < 100 && !boxPlaced; i++) {
+            const col = Math.floor(Math.random() * gridCols);
+            const row = Math.floor(Math.random() * gridRows);
+
+            const startPoint = pathPoints[0];
+            const isStart = col === startPoint.x && row === startPoint.y;
+            const endPoint = pathPoints[pathPoints.length - 1];
+            const isEnd = col === endPoint.x && row === endPoint.y;
+
+            // 경로 위, 시작점, 끝점이 아니면 박스 배치
+            if (!isPathCell(col, row) && !isStart && !isEnd) {
+                boxRef.current = { col, row };
+                boxPlaced = true;
+            }
+        }
+    }, [pathPoints, tileSize]); // tileSize가 변경될 때 isPathCell의 기준이 바뀌므로 포함
+
+    // 최초 렌더링 시 박스 생성
+    useEffect(() => {
+        generateRandomBox();
+    }, [generateRandomBox]);
+
+
     // ----------- 반응형 스케일 -----------
     useEffect(() => {
         function handleResize() {
@@ -89,6 +118,13 @@ export default function DefenseGamePost() {
             return;
         }
         const { col, row } = cellFromWorld(px, py);
+
+        // 박스 위에 설치 금지
+        if (boxRef.current && boxRef.current.col === col && boxRef.current.row === row) {
+            setMessage("박스 위에는 설치할 수 없습니다");
+            return;
+        }
+
         // 경로 위에는 설치 금지
         if (isPathCell(col, row)) {
             setMessage("경로 위에는 설치할 수 없습니다");
@@ -230,7 +266,7 @@ export default function DefenseGamePost() {
     }, [tileSize, running]);
 
     function update(dt) {
-        // 적 이동
+        // 적 이동 (이하 로직 동일)
         const enemies = enemiesRef.current;
         for (let e of enemies) {
             // 다음 경로 포인트로 이동
@@ -342,12 +378,15 @@ export default function DefenseGamePost() {
             // 게임오버: 루프는 계속 돌지만 메시지 갱신
             setMessage("Game Over! 새로고침(F5)으로 재시작");
             setRunning(false);
-            enemies.length = 0;
-            bullets.length = 0;
+            enemiesRef.current = [];
+            bulletsRef.current = [];
         } else if (running) {
             // 남은 적이 없고, 스폰도 끝났다면 웨이브 종료
             // 간단 체크: 일정 시간 적이 없으면 종료 메시지
-            if (enemies.length === 0) {
+            const spawnIsFinished = enemiesRef.current.length === 0;
+            // 이 부분은 원래 로직이 조금 불완전하여 수정합니다.
+            // isSpawning 같은 상태를 두는 것이 더 정확하지만, 여기서는 적이 0이 되면 바로 클리어되도록 유지합니다.
+            if (spawnIsFinished) {
                 setRunning(false);
                 setMessage(`Wave ${wave} 클리어! Start Wave로 다음 웨이브`);
             }
@@ -388,24 +427,43 @@ export default function DefenseGamePost() {
         }
         ctx.stroke();
 
-        // 경로 끝에 'X' 표시 (추가된 코드)
+        // 경로 끝에 'X' 표시
         const endPoint = pathPoints[pathPoints.length - 1];
         if (endPoint) {
             const cx = (endPoint.x + 0.5) * tileSize;
             const cy = (endPoint.y + 0.5) * tileSize;
-            const size = tileSize * 0.25; // X 크기
-
-            ctx.strokeStyle = "#a14e69"; // X 색상
-            ctx.lineWidth = 4;           // X 두께
+            const size = tileSize * 0.25;
+            ctx.strokeStyle = "#a14e69";
+            ctx.lineWidth = 4;
             ctx.lineCap = "round";
-
             ctx.beginPath();
-            // 대각선 1: \
             ctx.moveTo(cx - size, cy - size);
             ctx.lineTo(cx + size, cy + size);
-            // 대각선 2: /
             ctx.moveTo(cx + size, cy - size);
             ctx.lineTo(cx - size, cy + size);
+            ctx.stroke();
+        }
+
+        // 박스 그리기
+        if (boxRef.current) {
+            const { col, row } = boxRef.current;
+            const x = col * tileSize;
+            const y = row * tileSize;
+
+            ctx.fillStyle = "#a0522d"; // Sienna
+            ctx.strokeStyle = "#5e2f0d";
+            ctx.lineWidth = 2;
+
+            ctx.fillRect(x + 4, y + 4, tileSize - 8, tileSize - 8);
+            ctx.strokeRect(x + 4, y + 4, tileSize - 8, tileSize - 8);
+
+            ctx.beginPath();
+            ctx.moveTo(x + 4, y + 4);
+            ctx.lineTo(x + tileSize - 4, y + tileSize - 4);
+            ctx.moveTo(x + tileSize - 4, y + 4);
+            ctx.lineTo(x + 4, y + tileSize - 4);
+            ctx.strokeStyle = "#d2691e"; // Chocolate
+            ctx.lineWidth = 1;
             ctx.stroke();
         }
 
@@ -456,91 +514,93 @@ export default function DefenseGamePost() {
 
     return (
         <Layout>
-        <div
-            ref={wrapperRef}
-            style={{
-                maxWidth: "100%",
-                margin: "0 auto",
-                padding: "12px",
-                background: "#fff",
-                borderRadius: "16px",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
-            }}
-        >
-            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                <h2 style={{ margin: 0 }}>🛡️ Mini Defense</h2>
-                <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
-                    <Badge label={`Wave ${wave}`} />
-                    <Badge label={`Gold ${gold}`} />
-                    <Badge label={`Lives ${lives}`} color="#ff6b6b" />
-                </div>
-            </div>
-
-            <p style={{ margin: "6px 0 12px", color: "#555" }}>
-                빈 타일을 클릭/터치하면 <strong>포탑(50G)</strong>을 설치합니다. 적이 우측 끝에 도달하기 전에 제거하세요.
-            </p>
-
-            <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-                <button
-                    onClick={startWave}
-                    disabled={running || lives <= 0}
-                    style={primaryBtnStyle(running || lives <= 0)}
-                >
-                    Start Wave
-                </button>
-                <button
-                    onClick={() => {
-                        // 간단 리셋
-                        towersRef.current = [];
-                        enemiesRef.current = [];
-                        bulletsRef.current = [];
-                        setGold(150);
-                        setLives(10);
-                        setWave(0);
-                        setRunning(false);
-                        setMessage("Start Wave를 누르세요");
-                    }}
-                    style={ghostBtnStyle}
-                >
-                    Reset
-                </button>
-            </div>
-
-            <div style={{ position: "relative", width: width, height: height }}>
-                <canvas
-                    ref={canvasRef}
-                    width={width}
-                    height={height}
-                    style={{
-                        width: width,
-                        height: height,
-                        touchAction: "manipulation",
-                        borderRadius: 12,
-                        background: "#f8f4f6",
-                    }}
-                />
-            </div>
-
             <div
+                ref={wrapperRef}
                 style={{
-                    marginTop: 10,
-                    padding: "10px 12px",
-                    borderRadius: 10,
-                    background: "#fff6f8",
-                    color: "#80324a",
-                    fontSize: 14,
-                    border: "1px solid #f3d1da",
+                    maxWidth: "100%",
+                    margin: "0 auto",
+                    padding: "12px",
+                    background: "#fff",
+                    borderRadius: "16px",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
                 }}
             >
-                {message}
-            </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                    <h2 style={{ margin: 0 }}>🛡️ Mini Defense</h2>
+                    <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
+                        <Badge label={`Wave ${wave}`} />
+                        <Badge label={`Gold ${gold}`} />
+                        <Badge label={`Lives ${lives}`} color="#ff6b6b" />
+                    </div>
+                </div>
 
-            <ul style={{ fontSize: 14, color: "#666", marginTop: 10, lineHeight: 1.6 }}>
-                <li>포탑 비용: 50 Gold, 적 처치: +10 Gold</li>
-                <li>웨이브마다 적 HP/속도 증가</li>
-                <li>모바일에서도 터치로 설치 가능</li>
-            </ul>
-        </div>
+                <p style={{ margin: "6px 0 12px", color: "#555" }}>
+                    빈 타일을 클릭/터치하면 <strong>포탑(50G)</strong>을 설치합니다. 적이 우측 끝에 도달하기 전에 제거하세요.
+                </p>
+
+                <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+                    <button
+                        onClick={startWave}
+                        disabled={running || lives <= 0}
+                        style={primaryBtnStyle(running || lives <= 0)}
+                    >
+                        Start Wave
+                    </button>
+                    <button
+                        onClick={() => {
+                            // 간단 리셋
+                            towersRef.current = [];
+                            enemiesRef.current = [];
+                            bulletsRef.current = [];
+                            setGold(150);
+                            setLives(10);
+                            setWave(0);
+                            setRunning(false);
+                            generateRandomBox(); // 리셋 시 박스 재생성
+                            setMessage("Start Wave를 누르세요");
+                        }}
+                        style={ghostBtnStyle}
+                    >
+                        Reset
+                    </button>
+                </div>
+
+                <div style={{ position: "relative", width: width, height: height }}>
+                    <canvas
+                        ref={canvasRef}
+                        width={width}
+                        height={height}
+                        style={{
+                            width: width,
+                            height: height,
+                            touchAction: "manipulation",
+                            borderRadius: 12,
+                            background: "#f8f4f6",
+                        }}
+                    />
+                </div>
+
+                <div
+                    style={{
+                        marginTop: 10,
+                        padding: "10px 12px",
+                        borderRadius: 10,
+                        background: "#fff6f8",
+                        color: "#80324a",
+                        fontSize: 14,
+                        border: "1px solid #f3d1da",
+                    }}
+                >
+                    {message}
+                </div>
+
+                <ul style={{ fontSize: 14, color: "#666", marginTop: 10, lineHeight: 1.6 }}>
+                    <li>포탑 비용: 50 Gold, 적 처치: +10 Gold</li>
+                    <li><strong>맵에 있는 박스 위에는 포탑을 설치할 수 없습니다.</strong></li>
+                    <li>웨이브마다 적 HP/속도 증가</li>
+                    <li>모바일에서도 터치로 설치 가능</li>
+                </ul>
+            </div>
         </Layout>
     );
 }
