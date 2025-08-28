@@ -20,15 +20,17 @@ export default function Layout({ children }) {
             {/* 상단(Header) */}
             <header
                 style={{
-                    padding: "1rem",
+                    padding: "0.3rem 1rem", // 이렇게 수정하여 상하 여백을 줄입니다.
                     background: "#e8d5d5",
                     boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                    display: "flex",       // nav를 수직 중앙 정렬하기 위해 추가
+                    alignItems: "center",  // nav를 수직 중앙 정렬하기 위해 추가
                     position: "sticky",
                     top: 0,
                     zIndex: 100,
                 }}
             >
-                <nav style={{ marginTop: "0.5rem" }}>
+                <nav> {/* nav의 marginTop은 제거해도 좋습니다. */}
                     <Link
                         to="/"
                         style={{
@@ -36,8 +38,7 @@ export default function Layout({ children }) {
                             color: "#007acc",
                             textDecoration: "none",
                         }}
-                    >
-                        홈으로
+                    >홈으로
                     </Link>
                 </nav>
             </header>
@@ -71,7 +72,7 @@ export default function Layout({ children }) {
                     data-ad-height="100"
                 ></ins>
                 <p style={{ margin: 0, color: "#555", marginTop: "0.5rem" }}>
-                    © 2025 My Blog. All rights reserved. e-mail:nanahjhna7@naver.com
+                    © 2025 My Blog. All rights reserved. <br/> e-mail:nanahjhna7@naver.com
                 </p>
             </footer>
         </div>

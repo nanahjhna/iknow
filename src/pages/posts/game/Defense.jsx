@@ -17,16 +17,17 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 export default function DefenseGamePost() {
     // ----------- 기본 설정 -----------
     const tileSizeBase = 56; // 기본 타일 픽셀(반응형에서 스케일됨)
-    const gridCols = 12;
-    const gridRows = 8;
+    const gridCols = 10;
+    const gridRows = 10;
     const pathPoints = useMemo(
         () => [
-            { x: 0, y: 1 },
-            { x: 3, y: 1 },
-            { x: 3, y: 5 },
-            { x: 7, y: 5 },
-            { x: 7, y: 2 },
-            { x: 11, y: 2 },
+            { x: 0, y: 3 },
+            { x: 4, y: 3 },
+            { x: 4, y: 7 },
+            { x: 8, y: 7 },
+            { x: 8, y: 4 },
+            // 마지막 지점의 x 좌표가 gridCols(10)보다 클 수 없으므로 수정합니다.
+            { x: 9, y: 4 },
         ],
         []
     );
@@ -386,6 +387,27 @@ export default function DefenseGamePost() {
             else ctx.lineTo(x, y);
         }
         ctx.stroke();
+
+        // 경로 끝에 'X' 표시 (추가된 코드)
+        const endPoint = pathPoints[pathPoints.length - 1];
+        if (endPoint) {
+            const cx = (endPoint.x + 0.5) * tileSize;
+            const cy = (endPoint.y + 0.5) * tileSize;
+            const size = tileSize * 0.25; // X 크기
+
+            ctx.strokeStyle = "#a14e69"; // X 색상
+            ctx.lineWidth = 4;           // X 두께
+            ctx.lineCap = "round";
+
+            ctx.beginPath();
+            // 대각선 1: \
+            ctx.moveTo(cx - size, cy - size);
+            ctx.lineTo(cx + size, cy + size);
+            // 대각선 2: /
+            ctx.moveTo(cx + size, cy - size);
+            ctx.lineTo(cx - size, cy + size);
+            ctx.stroke();
+        }
 
         // 포탑
         for (let t of towersRef.current) {
