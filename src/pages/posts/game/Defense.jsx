@@ -18,16 +18,16 @@ export default function DefenseGamePost() {
     // ----------- 기본 설정 -----------
     const tileSizeBase = 56; // 기본 타일 픽셀(반응형에서 스케일됨)
     const gridCols = 10;
-    const gridRows = 10;
+    const gridRows = 9;
     const pathPoints = useMemo(
         () => [
-            { x: 0, y: 3 },
-            { x: 4, y: 3 },
-            { x: 4, y: 7 },
-            { x: 8, y: 7 },
-            { x: 8, y: 4 },
+            { x: 0, y: 2 },
+            { x: 3, y: 2 },
+            { x: 3, y: 6 },
+            { x: 8, y: 6 },
+            { x: 8, y: 3 },
             // 마지막 지점의 x 좌표가 gridCols(10)보다 클 수 없으므로 수정합니다.
-            { x: 9, y: 4 },
+            { x: 9, y: 3 },
         ],
         []
     );
