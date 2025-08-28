@@ -21,12 +21,10 @@ export default function DefenseGamePost() {
     const gridRows = 8;
     const pathPoints = useMemo(
         () => [
-            { x: 0, y: 1 },
-            { x: 3, y: 1 },
-            { x: 3, y: 5 },
-            { x: 7, y: 5 },
-            { x: 7, y: 2 },
-            { x: 11, y: 2 },
+            { x: 0, y: 0 },   // 시작 (왼쪽 위)
+            { x: 11, y: 0 },  // 오른쪽으로 이동
+            { x: 11, y: 7 },  // 아래로 이동
+            { x: 1, y: 7},   // 왼쪽으로 이동
         ],
         []
     );
@@ -82,22 +80,32 @@ export default function DefenseGamePost() {
     }, []);
 
     // ----------- 입력: 클릭/터치로 포탑 설치 -----------
+    // 포탑 설치 함수
     function placeTowerAt(px, py) {
         if (gold < 50) {
             setMessage("Gold가 부족합니다 (50 필요)");
             return;
         }
         const { col, row } = cellFromWorld(px, py);
+
+        // 1행 차단
+        if (row === 1 || row === 6 || col === 10) {
+            setMessage(row + "행에는 포탑을 설치할 수 없습니다");
+            return;
+        }
+
         // 경로 위에는 설치 금지
         if (isPathCell(col, row)) {
             setMessage("경로 위에는 설치할 수 없습니다");
             return;
         }
+
         // 이미 포탑 있는지 체크
         if (towersRef.current.some(t => t.col === col && t.row === row)) {
             setMessage("이미 포탑이 있습니다");
             return;
         }
+
         const { x, y } = worldFromCell(col, row);
         towersRef.current.push({
             col,
