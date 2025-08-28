@@ -19,6 +19,11 @@ const categories = [
             { name: "우을증", path: "melancholia" }
         ]
     },
+    {
+        name: "게임", path: "game", sub: [
+            { name: "디펜스게임", path: "defense" }
+        ]
+    },
     // 필요하면 더 추가
 ];
 

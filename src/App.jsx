@@ -13,6 +13,10 @@ import AdhdPost from "./pages/posts/selftest/Adhd";
 // ... 다른 카테고리도 동일하게
 import MelancholiaPost from "./pages/posts/selftest/Melancholia";
 
+// ... 다른 카테고리도 동일하게
+import DefenseGamePost from "./pages/posts/game/Defense";
+
+
 export default function App() {
     return (
         <Routes>
@@ -29,6 +33,9 @@ export default function App() {
 
             {/* 나머지 카테고리도 동일 */}
             <Route path="/category/selftest/melancholia" element={<MelancholiaPost />} />
+
+            {/* 나머지 카테고리도 동일 */}
+            <Route path="/category/game/defense" element={<DefenseGamePost />} />
 
         </Routes>
     );
