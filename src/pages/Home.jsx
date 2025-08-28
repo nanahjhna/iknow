@@ -16,7 +16,7 @@ const categories = [
     {
         name: "자가진단", path: "selftest", sub: [
             { name: "ADHD", path: "adhd" },
-            { name: "우을증", path: "melancholia" }
+            { name: "우울증", path: "melancholia" }
         ]
     },
     {

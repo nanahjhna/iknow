@@ -433,6 +433,7 @@ export default function DefenseGamePost() {
     const height = gridRows * tileSize;
 
     return (
+        <Layout>
         <div
             ref={wrapperRef}
             style={{
@@ -518,6 +519,7 @@ export default function DefenseGamePost() {
                 <li>모바일에서도 터치로 설치 가능</li>
             </ul>
         </div>
+        </Layout>
     );
 }
 
