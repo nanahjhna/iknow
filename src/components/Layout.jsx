@@ -48,7 +48,7 @@ export default function Layout({ children }) {
                 style={{
                     padding: "1rem",
                     background: "#fdfdfd",
-                    minHeight: "60vh",
+                    minHeight: "78vh",
                     boxSizing: "border-box",
                 }}
             >
